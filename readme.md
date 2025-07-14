@@ -163,7 +163,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 📞 Contact
 
-Saumen Mondal - [@saumenmondal](https://github.com/saumenmondal)
+Saumen Mondal - [@SaumenM0ndal](https://github.com/SaumenM0ndal)
 
 ## 🙏 Acknowledgements
 
