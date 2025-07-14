@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Maven
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
 ### Logs ###
 *.log
 logs/
