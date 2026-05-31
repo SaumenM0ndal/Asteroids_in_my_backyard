@@ -18,6 +18,7 @@ logs/
 **/application.properties
 application-*.properties
 !**/application.properties.example
+!**/src/test/resources/application-test.properties
 
 ### Docker ###
 docker/mysql/init.sql
