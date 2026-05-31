@@ -101,8 +101,13 @@ mvn clean install
 
 ### Configuration
 
-- Add your NASA API key and Kafka URL in `asteroidalerting/src/main/resources/application.properties`
-- Add your SMTP details in `notificationservice/src/main/resources/application.properties`
+- Real `application.properties` files are gitignored and stay local only.
+- Copy the provided templates and fill in your local secrets:
+
+```powershell
+Copy-Item "asteroidalerting/src/main/resources/application.properties.example" "asteroidalerting/src/main/resources/application.properties"
+Copy-Item "notificationservice/src/main/resources/application.properties.example" "notificationservice/src/main/resources/application.properties"
+```
 
 ## 💻 Usage
 

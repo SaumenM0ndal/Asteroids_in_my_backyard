@@ -15,7 +15,9 @@ logs/
 ### Secrets / Env ###
 .env
 *.env
+**/application.properties
 application-*.properties
+!**/application.properties.example
 
 ### Docker ###
 docker/mysql/init.sql
