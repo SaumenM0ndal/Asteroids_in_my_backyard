@@ -140,7 +140,7 @@ mvn spring-boot:run
 
 ```properties
 nasa.neo.api.url=https://api.nasa.gov/neo/rest/v1/feed
-nasa.api.key=YOUR_API_KEY
+nasa.api.key=replace_with_local_nasa_key
 spring.kafka.bootstrap-servers=localhost:9092
 ```
 
@@ -149,11 +149,11 @@ spring.kafka.bootstrap-servers=localhost:9092
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/asteroidalerting
 spring.datasource.username=root
-spring.datasource.password=password
+spring.datasource.password=replace_with_local_password
 spring.kafka.consumer.group-id=asteroid-alert
-spring.mail.username=your_mailtrap_username
-spring.mail.password=your_mailtrap_password
-email.service.from.email=your_email@example.com
+spring.mail.username=replace_with_local_username
+spring.mail.password=replace_with_local_password
+email.service.from.email=replace_with_local_from_email@example.com
 ```
 
 ## 📚 API Reference
