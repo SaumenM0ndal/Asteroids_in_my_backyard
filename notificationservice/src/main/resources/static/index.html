@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroid Alert Dashboard</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f6f8fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --success: #059669;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .title p {
+            margin: 6px 0 0;
+            color: var(--muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            min-height: 22px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            color: var(--muted);
+        }
+
+        .status.ok {
+            color: var(--success);
+        }
+
+        .status.err {
+            color: var(--danger);
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stats {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            margin-bottom: 6px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-value {
+            margin: 4px 0 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .two-col {
+            grid-template-columns: minmax(300px, 1fr) minmax(420px, 2fr);
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .section-subtitle {
+            margin: 0 0 14px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 10px;
+            font-size: 14px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            padding: 9px 8px;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .table-wrap {
+            overflow: auto;
+            max-height: 560px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pill-ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .pill-pending {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .inline-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .small-btn {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: #fff;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="title">
+            <h1>Asteroid Alert Dashboard</h1>
+            <p>Control panel for `notificationservice` and `asteroidalerting`</p>
+        </div>
+        <div class="actions">
+            <button id="trigger-btn" class="btn btn-primary">Trigger NASA Scan</button>
+            <button id="send-btn" class="btn btn-secondary">Send Pending Emails</button>
+            <button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+        </div>
+    </div>
+
+    <div id="status" class="status">Ready.</div>
+
+    <div class="grid stats">
+        <div class="card">
+            <p class="stat-label">Total Notifications</p>
+            <p id="stat-total-notifications" class="stat-value">-</p>
+        </div>
+        <div class="card">
+            <p class="stat-label">Pending Emails</p>
+            <p id="stat-pending-emails" class="stat-value">-</p>
+        </div>
+        <div class="card">
+            <p class="stat-label">Total Users</p>
+            <p id="stat-total-users" class="stat-value">-</p>
+        </div>
+        <div class="card">
+            <p class="stat-label">Subscribed Users</p>
+            <p id="stat-subscribed-users" class="stat-value">-</p>
+        </div>
+    </div>
+
+    <div class="grid two-col">
+        <section class="card">
+            <h2 class="section-title">Subscribers</h2>
+            <p class="section-subtitle">Users with notifications enabled receive asteroid alert emails.</p>
+
+            <form id="user-form">
+                <div>
+                    <label for="full-name">Full Name</label>
+                    <input id="full-name" type="text" placeholder="Ada Lovelace">
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" type="email" placeholder="ada@example.com" required>
+                </div>
+                <label class="checkbox-row" for="enabled">
+                    <input id="enabled" type="checkbox" checked>
+                    Enable notifications for this user
+                </label>
+                <button type="submit" class="btn btn-primary">Add Subscriber</button>
+            </form>
+
+            <hr style="margin: 16px 0; border: none; border-top: 1px solid var(--border);">
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="users-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">Recent Notifications</h2>
+            <p class="section-subtitle">Latest 100 asteroid events consumed from Kafka and stored in MySQL.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Asteroid</th>
+                        <th>Approach Date</th>
+                        <th>Miss Distance (km)</th>
+                        <th>Avg Diameter (m)</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody id="notifications-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    const statusEl = document.getElementById("status");
+    const triggerBtn = document.getElementById("trigger-btn");
+    const sendBtn = document.getElementById("send-btn");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const userForm = document.getElementById("user-form");
+
+    const statTotalNotifications = document.getElementById("stat-total-notifications");
+    const statPendingEmails = document.getElementById("stat-pending-emails");
+    const statTotalUsers = document.getElementById("stat-total-users");
+    const statSubscribedUsers = document.getElementById("stat-subscribed-users");
+
+    const usersBody = document.getElementById("users-body");
+    const notificationsBody = document.getElementById("notifications-body");
+
+    function setStatus(message, type = "") {
+        statusEl.textContent = message;
+        statusEl.className = "status";
+        if (type) {
+            statusEl.classList.add(type);
+        }
+    }
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            headers: {"Content-Type": "application/json"},
+            ...options
+        });
+
+        if (!response.ok) {
+            const body = await response.text();
+            throw new Error(body || `Request failed: ${response.status}`);
+        }
+
+        if (response.status === 204) {
+            return null;
+        }
+
+        const text = await response.text();
+        return text ? JSON.parse(text) : null;
+    }
+
+    function formatNumber(value) {
+        if (value === null || value === undefined || value === "") {
+            return "-";
+        }
+        const n = Number(value);
+        return Number.isNaN(n) ? String(value) : n.toLocaleString();
+    }
+
+    async function loadStats() {
+        const stats = await api("/api/ui/stats");
+        statTotalNotifications.textContent = formatNumber(stats.totalNotifications);
+        statPendingEmails.textContent = formatNumber(stats.pendingEmails);
+        statTotalUsers.textContent = formatNumber(stats.totalUsers);
+        statSubscribedUsers.textContent = formatNumber(stats.subscribedUsers);
+    }
+
+    async function loadUsers() {
+        const users = await api("/api/ui/users");
+        usersBody.innerHTML = "";
+
+        if (!users.length) {
+            usersBody.innerHTML = `<tr><td colspan="4" class="muted">No subscribers yet.</td></tr>`;
+            return;
+        }
+
+        users.forEach((user) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${escapeHtml(user.fullName || "-")}</td>
+                <td>${escapeHtml(user.email || "-")}</td>
+                <td>
+                    <span class="pill ${user.notificationEnabled ? "pill-ok" : "pill-pending"}">
+                        ${user.notificationEnabled ? "Enabled" : "Disabled"}
+                    </span>
+                </td>
+                <td>
+                    <div class="inline-actions">
+                        <button class="small-btn" data-action="toggle" data-id="${user.id}" data-enabled="${user.notificationEnabled}">
+                            ${user.notificationEnabled ? "Disable" : "Enable"}
+                        </button>
+                        <button class="small-btn" data-action="delete" data-id="${user.id}">Delete</button>
+                    </div>
+                </td>
+            `;
+            usersBody.appendChild(row);
+        });
+    }
+
+    async function loadNotifications() {
+        const notifications = await api("/api/ui/notifications");
+        notificationsBody.innerHTML = "";
+
+        if (!notifications.length) {
+            notificationsBody.innerHTML = `<tr><td colspan="6" class="muted">No notification records yet.</td></tr>`;
+            return;
+        }
+
+        notifications.forEach((n) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${n.id}</td>
+                <td>${escapeHtml(n.asteroidName || "-")}</td>
+                <td>${escapeHtml(n.closeApproachDate || "-")}</td>
+                <td>${formatNumber(n.missDistanceKilometers)}</td>
+                <td>${formatNumber(n.estimatedDiameterAvgMeters)}</td>
+                <td>
+                    <span class="pill ${n.emailSent ? "pill-ok" : "pill-pending"}">
+                        ${n.emailSent ? "Sent" : "Pending"}
+                    </span>
+                </td>
+            `;
+            notificationsBody.appendChild(row);
+        });
+    }
+
+    async function refreshAll() {
+        await Promise.all([loadStats(), loadUsers(), loadNotifications()]);
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    triggerBtn.addEventListener("click", async () => {
+        try {
+            triggerBtn.disabled = true;
+            setStatus("Triggering asteroid scan...", "");
+            await api("/api/ui/trigger-alert", {method: "POST"});
+            setStatus("Asteroid scan triggered successfully.", "ok");
+            setTimeout(refreshAll, 1500);
+        } catch (error) {
+            setStatus(`Failed to trigger scan: ${error.message}`, "err");
+        } finally {
+            triggerBtn.disabled = false;
+        }
+    });
+
+    sendBtn.addEventListener("click", async () => {
+        try {
+            sendBtn.disabled = true;
+            setStatus("Requesting email dispatch...", "");
+            await api("/api/ui/send-emails", {method: "POST"});
+            setStatus("Email dispatch requested.", "ok");
+            setTimeout(refreshAll, 2000);
+        } catch (error) {
+            setStatus(`Failed to request email send: ${error.message}`, "err");
+        } finally {
+            sendBtn.disabled = false;
+        }
+    });
+
+    refreshBtn.addEventListener("click", async () => {
+        try {
+            refreshBtn.disabled = true;
+            setStatus("Refreshing dashboard...", "");
+            await refreshAll();
+            setStatus("Dashboard refreshed.", "ok");
+        } catch (error) {
+            setStatus(`Refresh failed: ${error.message}`, "err");
+        } finally {
+            refreshBtn.disabled = false;
+        }
+    });
+
+    userForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const payload = {
+            fullName: document.getElementById("full-name").value,
+            email: document.getElementById("email").value,
+            notificationEnabled: document.getElementById("enabled").checked
+        };
+
+        try {
+            setStatus("Adding subscriber...", "");
+            await api("/api/ui/users", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            userForm.reset();
+            document.getElementById("enabled").checked = true;
+            setStatus("Subscriber added.", "ok");
+            await refreshAll();
+        } catch (error) {
+            setStatus(`Could not add subscriber: ${error.message}`, "err");
+        }
+    });
+
+    usersBody.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        const action = target.dataset.action;
+        const id = target.dataset.id;
+
+        if (!action || !id) {
+            return;
+        }
+
+        try {
+            if (action === "toggle") {
+                const enabledNow = target.dataset.enabled === "true";
+                await api(`/api/ui/users/${id}`, {
+                    method: "PATCH",
+                    body: JSON.stringify({notificationEnabled: !enabledNow})
+                });
+                setStatus("Subscriber status updated.", "ok");
+            }
+
+            if (action === "delete") {
+                await api(`/api/ui/users/${id}`, {method: "DELETE"});
+                setStatus("Subscriber removed.", "ok");
+            }
+
+            await refreshAll();
+        } catch (error) {
+            setStatus(`Action failed: ${error.message}`, "err");
+        }
+    });
+
+    refreshAll()
+        .then(() => setStatus("Dashboard loaded.", "ok"))
+        .catch((error) => setStatus(`Initial load failed: ${error.message}`, "err"));
+
+    setInterval(() => {
+        refreshAll().catch(() => {
+            // Keep interval quiet unless the user triggers an action.
+        });
+    }, 15000);
+</script>
+</body>
+</html>
+

@@ -37,21 +37,24 @@ public class EmailService {
 
     @Async
     public void sendAsteroidAlertEmail() {
-
-        final String text = createEmailText();
-
-        if (text == null) {
-            log.info("No asteroids to send alerts for at {}", LocalDateTime.now());
-            return;
-        }
-
         final List<String> toEmails = userRepository.findAllEmailsAndNotificationEnabled();
         if (toEmails.isEmpty()) {
             log.info("No users to send email to");
             return;
         }
 
+        final List<Notification> pendingNotifications = notificationRepository.findByEmailSent(false);
+        if (pendingNotifications.isEmpty()) {
+            log.info("No asteroids to send alerts for at {}", LocalDateTime.now());
+            return;
+        }
+
+        final String text = createEmailText(pendingNotifications);
+
         toEmails.forEach(toEmail -> sendEmail(toEmail, text));
+
+        pendingNotifications.forEach(notification -> notification.setEmailSent(true));
+        notificationRepository.saveAll(pendingNotifications);
         log.info("Email sent to: #{} users", toEmails.size());
     }
 
@@ -65,14 +68,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    private String createEmailText() {
-        // check if there are any asteroids to send alerts for
-        List<Notification> notificationList = notificationRepository.findByEmailSent(false);
-
-        if(notificationList.isEmpty()) {
-            return null;
-        }
-
+    private String createEmailText(final List<Notification> notificationList) {
         StringBuilder emailText = new StringBuilder();
         emailText.append("Asteroid Alert: \n");
         emailText.append("=====================================\n");
@@ -83,8 +79,6 @@ public class EmailService {
             emailText.append("Estimated Diameter Avg Meters: ").append(notification.getEstimatedDiameterAvgMeters()).append("\n");
             emailText.append("Miss Distance Kilometers: ").append(notification.getMissDistanceKilometers()).append("\n");
             emailText.append("=====================================\n");
-            notification.setEmailSent(true);
-            notificationRepository.save(notification);
         });
 
         return emailText.toString();

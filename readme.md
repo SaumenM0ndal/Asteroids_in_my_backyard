@@ -41,11 +41,12 @@ The system comprises two Spring Boot microservices:
 
 ## ✨ Features
 
-- ⏱️ Scheduled fetching of asteroid data from NASA
+- 🧭 Manual scan trigger from REST endpoint or web dashboard
 - ⚡ Event-driven architecture using Kafka
 - 🔒 Criteria-based filtering of hazardous asteroids
 - 📧 Automatic email notifications to subscribed users
 - 📊 MySQL-based persistence of events
+- 🖥️ Built-in browser dashboard for subscribers, metrics, and alerts
 - 🚚 Docker Compose support for local infrastructure
 - 🔍 Logging for event traceability
 
@@ -117,8 +118,16 @@ mvn spring-boot:run
 
 ### Accessing the System
 
+- **Dashboard UI**: `http://localhost:8081`
 - **Kafka UI**: `http://localhost:8084`
 - **MySQL**: `localhost:3306` (user: `root`, password: `password`)
+
+### Using the Dashboard
+
+1. Open `http://localhost:8081`
+2. Add at least one subscriber email in the **Subscribers** panel
+3. Click **Trigger NASA Scan** to publish fresh asteroid events
+4. Use **Send Pending Emails** for immediate dispatch (scheduler also runs periodically)
 
 ## ⚙️ Configuration
 
